@@ -31,16 +31,19 @@ const connectDb = async () => {
 // POST /api/users - Create a new user
 app.post('/api/users', async (req, res) => {
   const { username, passwordHash, email, roles } = req.body;
-  
+  console.log(req.body);  // Log the request body
+
   await connectDb();
 
   try {
     const newUser = await User.create({ username, passwordHash, email, roles });
     res.status(201).json({ message: 'User Created', user: newUser });
   } catch (error) {
+    console.error(error);  // Log any errors
     res.status(400).json({ error: error.message });
   }
 });
+
 
 // GET /api/users - Get all users
 app.get('/api/users', async (req, res) => {

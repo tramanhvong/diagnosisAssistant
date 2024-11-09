@@ -6,6 +6,9 @@
     "mongoose": "^8.8.1"
   },
   "scripts": {
-    "dev": "node server.js"
+    "dev": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
