@@ -24,14 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className='container-fluid p-0'>
-          <div className='row g-0'>
-            <div className='col-1 p-0'>
-              <SideBar />
-            </div>
-            <div className='col-11 p-0'>{children}</div>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );
