@@ -1,8 +1,9 @@
 import localFont from 'next/font/local';
+import 'bootstrap/dist/css/bootstrap.css';
 import './globals.css';
-import bootstrap from 'bootstrap';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import SideBar from '@/component/side-bar';
 
-const bootstrap = require('bootstrap');
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -21,19 +22,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
-      <head>
-        <meta charset='utf-8' />
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <title>Bootstrap demo</title>
-        <link
-          href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'
-          rel='stylesheet'
-          integrity='sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH'
-          crossorigin='anonymous'
-        />
-      </head>
+    <html lang='en' suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <SideBar />
         {children}
       </body>
     </html>
