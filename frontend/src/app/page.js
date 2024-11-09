@@ -1,10 +1,7 @@
-import Image from 'next/image';
-import styles from './page.module.css';
-import SideBar from '@/component/side-bar';
-import LayoutSideBar from '@/layout';
+import React from 'react';
 
-export default function Home() {
+const Mainpage = () => {
   return <LayoutSideBar>Hello</LayoutSideBar>;
-}
+};
 
-export default MainPage
+export default Mainpage;
