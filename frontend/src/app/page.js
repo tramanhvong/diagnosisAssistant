@@ -6,3 +6,5 @@ import LayoutSideBar from '@/layout';
 export default function Home() {
   return <LayoutSideBar>Hello</LayoutSideBar>;
 }
+
+export default MainPage
