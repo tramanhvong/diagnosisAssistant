@@ -5,6 +5,8 @@ import UserInput from './models/inputs.js';
 import connectMongoDB from './libs/mongodb.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const port = 5000; 
@@ -91,6 +93,56 @@ app.delete('/api/inputs/:id', async (req, res) => {
     res.status(200).json({ message: 'Input deleted' });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+
+// Login route
+app.post('/api/auth/login', async (req, res) => {
+  console.log('backend logging in');
+  
+  const { email, password } = req.body;
+  console.log("email:"+email);
+  console.log("pass:"+password);
+  
+
+  try {
+    await connectDb();
+
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    console.log(user);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password.' });
+    }
+
+    // Compare hashed password with provided password
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    console.log("match?"+isMatch);
+    
+    if (!isMatch) {
+      console.log("invalaid pass");
+      
+      return res.status(401).json({ error: 'Invalid email or password.' });
+    }
+    console.log("secret key:"+process.env.JWT_SECRET);
+    
+
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // Token expiration time
+    );
+
+    // Send the token in the response
+    console.log("login success");
+
+    res.status(200).json({ message: 'Login successful', token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'An error occurred during login.' });
   }
 });
 
