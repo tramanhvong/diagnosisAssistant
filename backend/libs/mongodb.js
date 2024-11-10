@@ -1,9 +1,15 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const connectMongoDB = async () => {
   try {
-    await mongoose.connect("mongodb+srv://williamnguyen:aAahutUmnyuvxS0k@cluster0.liql6.mongodb.net/medical_db");
-    console.log("Connected to MongoDB.");
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to MongoDB.');
   } catch (error) {
     console.log(error);
   }
