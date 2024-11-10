@@ -1,36 +1,40 @@
-import express from "express";
+import express from 'express';
 // import mongoose from 'mongoose';
-import User from './models/user.js'; 
+import User from './models/user.js';
 import UserInput from './models/inputs.js';
 import connectMongoDB from './libs/mongodb.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import chatRoute from './route/chatRoute.js';
 
 const app = express();
-const port = 5000; 
+const port = 5000;
 
 dotenv.config(); // Load environment variables from .env file
 
 const allowedOrigin = process.env.CLIENT_URL;
-console.log("allowurl"+allowedOrigin);
+console.log('allowurl' + allowedOrigin);
 
-app.use(cors({
-  origin: allowedOrigin,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-}));
+app.use(
+  cors({
+    origin: allowedOrigin,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // Middleware to parse JSON requests
 app.use(express.json());
+
+app.use('/api/chat', chatRoute);
 
 app.get('/', (req, res) => {
   res.send('Backend Server is running!');
 });
 
-
-// Connect to MongoDB 
+// Connect to MongoDB
 const connectDb = async () => {
   try {
     await connectMongoDB();
@@ -57,15 +61,18 @@ app.post('/api/users', async (req, res) => {
   } catch (error) {
     // Handle MongoDB duplicate key error (E11000)
     if (error.code === 11000) {
-      res.status(409).json({ error: 'This email is already registered. Please use a different email.' });
+      res
+        .status(409)
+        .json({
+          error:
+            'This email is already registered. Please use a different email.',
+        });
     } else {
       console.error('Error during registration:', error); // Log the error for debugging
       res.status(400).json({ error: error.message || 'Registration failed.' });
     }
   }
 });
-
-
 
 // GET /api/inputs - Get all input entries
 app.get('/api/inputs', async (req, res) => {
@@ -96,15 +103,13 @@ app.delete('/api/inputs/:id', async (req, res) => {
   }
 });
 
-
 // Login route
 app.post('/api/auth/login', async (req, res) => {
   console.log('backend logging in');
-  
+
   const { email, password } = req.body;
-  console.log("email:"+email);
-  console.log("pass:"+password);
-  
+  console.log('email:' + email);
+  console.log('pass:' + password);
 
   try {
     await connectDb();
@@ -112,22 +117,21 @@ app.post('/api/auth/login', async (req, res) => {
     // Check if the user exists
     const user = await User.findOne({ email });
     console.log(user);
-    
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     // Compare hashed password with provided password
     const isMatch = await bcrypt.compare(password, user.passwordHash);
-    console.log("match?"+isMatch);
-    
+    console.log('match?' + isMatch);
+
     if (!isMatch) {
-      console.log("invalaid pass");
-      
+      console.log('invalaid pass');
+
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
-    console.log("secret key:"+process.env.JWT_SECRET);
-    
+    console.log('secret key:' + process.env.JWT_SECRET);
 
     // Create JWT token
     const token = jwt.sign(
@@ -137,7 +141,7 @@ app.post('/api/auth/login', async (req, res) => {
     );
 
     // Send the token in the response
-    console.log("login success");
+    console.log('login success');
 
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
