@@ -7,7 +7,6 @@ import { PythonShell } from 'python-shell';
 const router = express.Router();
 const USER_ID = process.env.USER_ID;
 
-
 const model = new ChatGoogleGenerativeAI({
   model: 'gemini-1.5-flash',
   maxOutputTokens: 2048,
@@ -26,34 +25,61 @@ const features = [
 ];
 
 // create a new chat
-router.post('/api/prompts', async (req, res) => {
-  const { message } = req.body;
+// router.post('/prompts', async (req, res) => {
+//   const { message } = req.body;
+//   const chat = new Chat({ message, user: USER_ID });
+//   const clientInput = [];
+
+//   try {
+//     features.map((feature) => {
+//       res.question(`Please enter ${feature}: `, (answer) => {
+//         clientInput.push(parseFloat(answer));
+//       });
+//     });
+//     const prediction = modelPredict(clientInput);
+//     let diagnosis = prediction == 1 ? 'diabetic' : 'not diabetic';
+
+//     // prepare response
+//     const diagnosis_output = `Here is your alledged diagnosis: ${diagnosis}`;
+//     if (prediction == 1) {
+//       const ai_response = model.generate_content(
+//         'Please give advice on the next step if their diagnosis is potentially diabetic.'
+//       );
+//     }
+
+//     const response = diagnosis_output + '\n' + ai_response;
+//     if (!response) {
+//       return res.status(400).json({ error: 'Response error' });
+//     }
+
+//     return res.status(201).json(response);
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// });
+
+router.post('/prompts', async (req, res) => {
+  const { message, inputValues } = req.body; // inputValues should be an array of numbers
   const chat = new Chat({ message, user: USER_ID });
-  const clientInput = [];
+
+  if (!Array.isArray(inputValues) || inputValues.length !== features.length) {
+    return res.status(400).json({ error: 'Invalid input values' });
+  }
 
   try {
-    features.map((feature) => {
-      res.question(`Please enter ${feature}: `, (answer) => {
-        clientInput.push(parseFloat(answer));
-      });
-    });
-    const prediction = modelPredict(clientInput);
-    let diagnosis = prediction == 1 ? 'diabetic' : 'not diabetic';
+    const prediction = await modelPredict(inputValues);
+    const diagnosis = prediction === 1 ? 'diabetic' : 'not diabetic';
 
-    // prepare response
-    const diagnosis_output = `Here is your alledged diagnosis: ${diagnosis}`;
-    if (prediction == 1) {
-      const ai_response = model.generate_content(
+    let responseMessage = `Here is your alleged diagnosis: ${diagnosis}`;
+
+    if (prediction === 1) {
+      const aiResponse = await model.generate_content(
         'Please give advice on the next step if their diagnosis is potentially diabetic.'
       );
+      responseMessage += `\n${aiResponse}`;
     }
 
-    const response = diagnosis_output + '\n' + ai_response;
-    if (!response) {
-      return res.status(400).json({ error: 'Response error' });
-    }
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: responseMessage });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -67,13 +93,25 @@ function modelPredict(values) {
       args: [JSON.stringify(values)],
     };
 
-    PythonShell.run('diabetes_model.py', options, (err, results) => {
-      if (err) {
-        return reject(err);
-      }
+    try {
+      PythonShell.run('diabetes_model.py', options, (err, results) => {
+        if (err) {
+          console.error('PythonShell error:', err); // Log the error
+          return reject(err); // Reject the promise with the error
+        }
 
-      resolve(parseInt(results[0]));
-    });
+        try {
+          const prediction = parseInt(results[0]);
+          resolve(prediction); // Resolve the promise with the parsed result
+        } catch (parseError) {
+          console.error('Error parsing PythonShell result:', parseError); // Log parse error
+          reject(parseError); // Reject the promise with the parse error
+        }
+      });
+    } catch (error) {
+      console.error('Unexpected error running PythonShell:', error); // Log any unexpected error
+      reject(error); // Reject the promise with the error
+    }
   });
 }
 
