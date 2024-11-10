@@ -26,12 +26,16 @@ router.post('/', async (req, res) => {
   const { message } = req.body;
   const chat = new Chat({ message, user: USER_ID });
   try {
+    // call chatbot api to get response
+    // const response = await chatbotAPI(message);
+    // chat.message.push(response);
+    // await
+    
     savedChat = await chat.save();
 
     if (!savedChat) {
       return res.status(400).json({ error: 'Chat not saved' });
     }
-
     return res.status(201).json(savedChat);
   } catch (error) {
     res.status(400).json({ error: error.message });
