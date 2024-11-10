@@ -1,5 +1,4 @@
 import express from 'express';
-// import mongoose from 'mongoose';
 import User from './models/user.js';
 import UserInput from './models/inputs.js';
 import connectMongoDB from './libs/mongodb.js';
@@ -8,7 +7,6 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import chatRoute from './route/chatRoute.js';
-
 const app = express();
 const port = 5000;
 
@@ -61,12 +59,10 @@ app.post('/api/users', async (req, res) => {
   } catch (error) {
     // Handle MongoDB duplicate key error (E11000)
     if (error.code === 11000) {
-      res
-        .status(409)
-        .json({
-          error:
-            'This email is already registered. Please use a different email.',
-        });
+      res.status(409).json({
+        error:
+          'This email is already registered. Please use a different email.',
+      });
     } else {
       console.error('Error during registration:', error); // Log the error for debugging
       res.status(400).json({ error: error.message || 'Registration failed.' });
