@@ -6,7 +6,7 @@ const InputField = ({ onSend }) => {
   const handleSend = () => {
     if (inputText.trim()) {
       onSend(inputText);
-      setInputText(''); 
+      setInputText('');
     }
   };
 
@@ -18,7 +18,7 @@ const InputField = ({ onSend }) => {
 
   return (
     <div className="input-group">
-      <input
+      <textarea
         type="text"
         className="form-control"
         placeholder="Type your message here"
