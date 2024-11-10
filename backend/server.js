@@ -4,8 +4,16 @@ import User from './models/user.js';
 import UserInput from './models/inputs.js';
 import connectMongoDB from './libs/mongodb.js';
 
+import cors from 'cors';
+
 const app = express();
 const port = 5000; 
+
+app.use(cors({
+  origin: 'http://localhost:3001',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+}));
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -31,13 +39,14 @@ const connectDb = async () => {
 // POST /api/users - Create a new user
 app.post('/api/users', async (req, res) => {
   const { username, passwordHash, email, roles } = req.body;
-  console.log(req.body);  // Log the request body
 
   await connectDb();
 
   try {
+    
     const newUser = await User.create({ username, passwordHash, email, roles });
     res.status(201).json({ message: 'User Created', user: newUser });
+    console.log('user created successfully');
   } catch (error) {
     console.error(error);  // Log any errors
     res.status(400).json({ error: error.message });
