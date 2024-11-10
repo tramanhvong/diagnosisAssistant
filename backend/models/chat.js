@@ -1,9 +1,10 @@
+// models/chat.js
 import mongoose, { Schema } from 'mongoose';
-import Message from './message';
 
 const chatSchema = new Schema({
   message: {
-    type: [Message],
+    type: [Schema.Types.ObjectId],
+    ref: 'Message',
     required: true,
   },
   user: {
@@ -16,6 +17,5 @@ const chatSchema = new Schema({
   },
 });
 
-const Chat = mongoose.models.Chat || mongoose.model('chat', chatSchema);
-
+const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);
 export default Chat;
