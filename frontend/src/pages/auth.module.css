@@ -32,6 +32,12 @@
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
+.success{
+  color: green;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+
+}
 
 .input {
   width: 100%;
