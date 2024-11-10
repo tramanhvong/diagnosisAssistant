@@ -5,6 +5,10 @@ const messageSchema = new Schema({
     type: String,
     required: true,
   },
+  isUser: {
+    type: Boolean,
+    required: true,
+  },
 });
 const Message =
   mongoose.models.Message || mongoose.model('message', messageSchema);
