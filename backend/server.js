@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import User from './models/user.js'; 
 import UserInput from './models/inputs.js';
 import connectMongoDB from './libs/mongodb.js';
@@ -9,11 +9,10 @@ import cors from 'cors';
 const app = express();
 const port = 5000; 
 
-dotenv.config();
-
+dotenv.config(); // Load environment variables from .env file
 
 const allowedOrigin = process.env.CLIENT_URL;
-console.log(allowedOrigin);
+console.log("allowurl"+allowedOrigin);
 
 app.use(cors({
   origin: allowedOrigin,
